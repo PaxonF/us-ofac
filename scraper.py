@@ -1,7 +1,7 @@
 import logging
 import requests
 from lxml import etree
-from dateutil.parser import parse as dateutil_parse
+from dalet import parse_date
 from datetime import datetime
 
 from libsanctions import Source, Entity, Alias, Identifier, make_uid
@@ -33,15 +33,6 @@ ID_TYPES = {
 }
 
 
-def parse_date(date):
-    if date is None or not len(date.strip()):
-        return
-    try:
-        return dateutil_parse(date).date().isoformat()
-    except:
-        return
-
-
 def parse_entry(source, entry, url, updated_at):
     uid = entry.findtext('uid')
     type_ = ENTITY_TYPES[entry.findtext('./sdnType')]
@@ -50,8 +41,10 @@ def parse_entry(source, entry, url, updated_at):
     entity = source.create_entity(make_uid(url, uid))
     entity.type = type_
     entity.updated_at = updated_at
-    entity.program = entry.findtext('./programList/program')
+    programs = [p.text for p in entry.findall('./programList/program')]
+    entity.program = '; '.join(programs)
     entity.summary = entry.findtext('./remarks')
+    entity.function = entry.findtext('./title')
     entity.first_name = entry.findtext('./firstName')
     entity.last_name = entry.findtext('./lastName')
 
