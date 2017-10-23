@@ -81,7 +81,7 @@ def parse_entry(source, entry, url, updated_at):
 
     for pob in entry.findall('./dateOfBirthList/dateOfBirthItem'):
         birth_date = entity.create_birth_date()
-        birth_date.place = parse_date(pob.findtext('./dateOfBirth'))
+        birth_date.date = parse_date(pob.findtext('./dateOfBirth'))
         birth_date.quality = BirthDate.QUALITY_WEAK
         if pob.findtext('./mainEntry') == 'true':
             birth_date.quality = BirthDate.QUALITY_STRONG
